@@ -1,0 +1,67 @@
+import Gallery from "../models/galleryModel.js";
+import User from "../models/userModel.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { sendToken } from "../utils/jwtToken.js";
+
+export const registerUser=asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+
+  // Check if user already exists
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return res.status(400).json({success:false,message:"user alredy register"})
+  }
+
+
+  const user = await User.create({ email, password });
+
+  user.password = undefined;
+
+  res.status(201).json({
+    success: true,
+    data: user
+  });
+})
+
+
+export const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+ 
+  if (!email || !password) {
+    return res.status(400).json({success:false,message:"Please provide email and password"})
+  }
+
+
+  const user = await User.findOne({ email }).select('+password');
+
+  if (!user || !(await user.comparePassword(password))) {
+    return res.status(400).json({success:false,message:"Invalid credentials"})
+  }
+
+
+  sendToken(user, 200, res);
+});
+
+export const logoutUser = asyncHandler(async (req, res) => {
+ res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', 
+   
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'Logged out successfully'
+  });
+});
+
+export const getCurrentUser = asyncHandler(async (req, res) => {
+  const user = req.user;
+  
+  res.status(200).json({
+    success: true,
+    data: user
+  });
+});
+
