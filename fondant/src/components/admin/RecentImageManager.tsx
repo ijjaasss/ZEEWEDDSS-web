@@ -64,6 +64,7 @@ const RecentImageManager: React.FC = () => {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
+          withCredentials:true
         }
       );
 
@@ -84,7 +85,7 @@ const RecentImageManager: React.FC = () => {
   // Delete image
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/recent-image/delete/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/recent-image/delete/${id}`,{withCredentials:true});
       setImages(images.filter(img => img._id !== id));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete image');
