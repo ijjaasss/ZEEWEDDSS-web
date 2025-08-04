@@ -3,25 +3,25 @@ import User from "../models/userModel.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendToken } from "../utils/jwtToken.js";
 
-export const registerUser=asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+// export const registerUser=asyncHandler(async (req, res) => {
+//     const { email, password } = req.body;
 
-  // Check if user already exists
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    return res.status(400).json({success:false,message:"user alredy register"})
-  }
+//   // Check if user already exists
+//   const existingUser = await User.findOne({ email });
+//   if (existingUser) {
+//     return res.status(400).json({success:false,message:"user alredy register"})
+//   }
 
 
-  const user = await User.create({ email, password });
+//   const user = await User.create({ email, password });
 
-  user.password = undefined;
+//   user.password = undefined;
 
-  res.status(201).json({
-    success: true,
-    data: user
-  });
-})
+//   res.status(201).json({
+//     success: true,
+//     data: user
+//   });
+// })
 
 
 export const loginUser = asyncHandler(async (req, res) => {
