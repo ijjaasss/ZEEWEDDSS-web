@@ -16,8 +16,8 @@ export const sendToken = (user, statusCode, res) => {
       Date.now() + env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
-    secure: false, 
-    sameSite: 'strict',
+    secure: env.NODE_ENV === 'production', 
+    sameSite: 'none' ,
   };
 
 
