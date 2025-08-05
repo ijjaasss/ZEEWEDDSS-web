@@ -28,8 +28,9 @@ export const loginUser = asyncHandler(async (req, res) => {
 export const logoutUser = asyncHandler(async (req, res) => {
  res.clearCookie('token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', 
-   
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'None', // Important for cross-site logout (e.g., Vercel frontend)
+    expires: new Date(0), // Optional: explicitly expires it
   });
 
   res.status(200).json({
