@@ -12,23 +12,17 @@ export const sendToken = (user, statusCode, res) => {
 
 
   const options = {
-    expires: new Date(
-      Date.now() + env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-    ),
+   
     httpOnly: true,
     secure: env.NODE_ENV === 'production', 
-    sameSite: 'None' ,
+    sameSite: env.NODE_ENV === 'production'?'None': 'Lax' ,
     path: '/',
+    maxAge: 15 * 60 * 1000, 
   };
 
 
   user.password = undefined;
 
-  res.status(statusCode)
-    .cookie('token', token, options)
-    .json({
-      success: true,
-      token,
-      data: user
-    });
+  res.cookie('token', token, options)
+
 };

@@ -23,14 +23,17 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 
   sendToken(user, 200, res);
+  res.status(200).json({
+      success: true,
+      data: user
+    });
 });
 
 export const logoutUser = asyncHandler(async (req, res) => {
  res.clearCookie('token', {
     httpOnly: true,
     secure: false,
-    sameSite: 'None', // Important for cross-site logout (e.g., Vercel frontend)
-    expires: new Date(0), // Optional: explicitly expires it
+    maxAge:0
   });
 
   res.status(200).json({
