@@ -18,6 +18,7 @@ export const sendToken = (user, statusCode, res) => {
     httpOnly: true,
     secure: env.NODE_ENV === 'production', 
     sameSite: 'None' ,
+    path: '/',
   };
 
 
