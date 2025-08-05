@@ -17,12 +17,16 @@ export const sendToken = (user, statusCode, res) => {
     secure: env.NODE_ENV === 'production', 
     sameSite: env.NODE_ENV === 'production'?'None': 'Lax' ,
     path: '/',
-    maxAge: 15 * 60 * 1000, 
+     maxAge: 15 * 60 * 1000, 
   };
 
 
   user.password = undefined;
 
-  res.cookie('token', token, options)
+  res.status(200).cookie('token', token, options).json({
+      success: true,
+      token,
+      data: user
+    });
 
 };

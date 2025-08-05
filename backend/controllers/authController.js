@@ -23,16 +23,14 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 
   sendToken(user, 200, res);
-  res.status(200).json({
-      success: true,
-      data: user
-    });
+
 });
 
 export const logoutUser = asyncHandler(async (req, res) => {
  res.clearCookie('token', {
     httpOnly: true,
-    secure: false,
+     secure: env.NODE_ENV === 'production',
+     sameSite: env.NODE_ENV === 'production' ? 'None' : 'Lax',
     maxAge:0
   });
 
