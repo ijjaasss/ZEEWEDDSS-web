@@ -1,7 +1,8 @@
 
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
+
 import {User} from '../types/index'
+import api from '../api/axiosInstance';
 
 interface AuthState {
   user: User | null;
@@ -21,13 +22,13 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/users/login`, {
+      const response = await api.post(`/users/login`, {
   email,
   password,
 }, {
   withCredentials: true, // Important
 });
-   
+localStorage.setItem('token', response.data.token);
       return response.data;
     } catch (error: any) {
      
@@ -41,7 +42,8 @@ export const getCurrentUser = createAsyncThunk(
   'auth/currentUser',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/me`, {
+    
+      const response = await   api.get(`/users/me`, {
         withCredentials: true,
       });
       return response.data;
@@ -55,9 +57,10 @@ export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/users/logout`, {}, {
+      await api.post(`/users/logout`, {}, {
         withCredentials: true,
       });
+      localStorage.removeItem('token')
     } catch (error: any) {
    
       return rejectWithValue(error.response?.data?.message || 'Logout failed');

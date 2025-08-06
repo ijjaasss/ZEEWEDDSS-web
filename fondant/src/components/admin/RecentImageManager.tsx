@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+
 import { Trash2, Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
 import ConfirmationModal from '../ui/ConfirmationModal';
+import api from '../../api/axiosInstance';
 
 
 interface RecentImage {
@@ -25,8 +26,8 @@ const RecentImageManager: React.FC = () => {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await axios.get<{ success: boolean; data: RecentImage[] }>(
-          `${import.meta.env.VITE_API_URL}/recent-image`
+        const response = await api.get<{ success: boolean; data: RecentImage[] }>(
+          `/recent-image`
         );
         if (response.data.success) {
           setImages(response.data.data);
@@ -57,8 +58,8 @@ const RecentImageManager: React.FC = () => {
 
     try {
       setUploading(true);
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/recent-image/upload`,
+      const response = await api.post(
+        `/recent-image/upload`,
         formData,
         {
           headers: {
@@ -85,7 +86,7 @@ const RecentImageManager: React.FC = () => {
   // Delete image
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/recent-image/delete/${id}`,{withCredentials:true});
+      await api.delete(`/recent-image/delete/${id}`,{withCredentials:true});
       setImages(images.filter(img => img._id !== id));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete image');

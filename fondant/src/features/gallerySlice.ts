@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { Gallery } from '../types/Gallery';
+import api from '../api/axiosInstance';
 
 interface GalleryState {
   currentGallery: Gallery | null;
@@ -37,7 +38,7 @@ export const createGallery = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/gallery/create`, galleryData, {
+      const response = await api.post(`/gallery/create`, galleryData, {
         withCredentials: true,
       });
       return response.data;
@@ -54,7 +55,7 @@ export const updateGallery = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.put(`${import.meta.env.VITE_API_URL}/gallery/update/${id}`, galleryData, {
+      const response = await api.put(`/gallery/update/${id}`, galleryData, {
         withCredentials: true,
       });
       return response.data;
@@ -66,7 +67,7 @@ export const updateGallery = createAsyncThunk(
 
 export const getGalleries = createAsyncThunk('gallery/getAll', async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}/gallery/getgalleries`, {
+    const response = await api.get(`/gallery/getgalleries`, {
       withCredentials: true,
     });
     return response.data;
@@ -79,7 +80,7 @@ export const getGalleryById = createAsyncThunk(
   'gallery/getById',
   async ({ id, page }: { id: string; page: number }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/gallery/get-by-id/${id}?page=${page}&limit=12`, {
+      const response = await api.get(`/gallery/get-by-id/${id}?page=${page}&limit=12`, {
         withCredentials: true,
       });
       return response.data;
@@ -96,7 +97,7 @@ export const uploadGalleryImage = createAsyncThunk(
       const formData = new FormData();
       formData.append('galleryId', galleryId);
       formData.append('image', file);
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/gallery-image/upload`, formData, {
+      const response = await api.post(`/gallery-image/upload`, formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -126,7 +127,7 @@ export const downloadGalleryImage = createAsyncThunk(
 
 export const deleteGallery = createAsyncThunk('gallery/delete', async (galleryId: string, { rejectWithValue }) => {
   try {
-    await axios.delete(`${import.meta.env.VITE_API_URL}/gallery/delete/${galleryId}`, {
+    await api.delete(`/gallery/delete/${galleryId}`, {
       withCredentials: true,
     });
     return galleryId;

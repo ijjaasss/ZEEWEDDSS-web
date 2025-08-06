@@ -1,3 +1,4 @@
+import env from "../config/env.js";
 import Gallery from "../models/galleryModel.js";
 import User from "../models/userModel.js";
 import { asyncHandler } from "../utils/asyncHandler.js";

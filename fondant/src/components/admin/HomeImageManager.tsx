@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+
 import { Home, User,  Check, X, Loader2 } from 'lucide-react';
 import ConfirmationModal from '../ui/ConfirmationModal';
+import api from '../../api/axiosInstance';
 
 interface PageImage {
   _id: string;
@@ -31,12 +32,11 @@ const HomeImageManager: React.FC = () => {
     pageType: string;
     file: File;
   } | null>(null);
-const baseUrl = import.meta.env.VITE_API_URL;
   // Fetch current images
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await axios.get(`${baseUrl}/home-page`);
+        const response = await api.get(`/home-page`);
         if (response.data.success) {
           setImages(response.data.data);
         }
@@ -82,8 +82,8 @@ const baseUrl = import.meta.env.VITE_API_URL;
 
     try {
       setUploading(prev => ({ ...prev, [pageType]: true }));
-      const response = await axios.post(
-        `${baseUrl}/home-page/upload`,
+      const response = await api.post(
+        `/home-page/upload`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' },withCredentials:true }
       );

@@ -1,7 +1,8 @@
 
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
+
 import { DashboardStats } from '../types';
+import api from '../api/axiosInstance';
 
 interface DashboardState {
   stats: DashboardStats;
@@ -25,8 +26,8 @@ export const getDashboardStats = createAsyncThunk(
   'dashboard/getStats',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/dashboard/stats`,
+      const response = await api.get(
+        `/dashboard/stats`,
         { withCredentials: true }
       );
       return response.data;
