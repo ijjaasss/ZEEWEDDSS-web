@@ -3,7 +3,7 @@ import multer from 'multer';
 
 const upload = multer({
   dest: 'uploads/', 
-  limits: { fileSize: 10 * 1024 * 1024 }, // Max 10MB
+  limits: { fileSize: 40 * 1024 * 1024 }, // Max 40MB
 });
 
 export default upload;

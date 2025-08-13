@@ -63,6 +63,7 @@ const AppRoutes = () => {
 };
 
 function App() {
+
   return (
     <Router>
       <div className="min-h-screen flex flex-col">

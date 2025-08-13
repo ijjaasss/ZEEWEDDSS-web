@@ -94,6 +94,7 @@ export const uploadGalleryImage = createAsyncThunk(
   'gallery/uploadImage',
   async ({ galleryId, file }: { galleryId: string; file: File }, { rejectWithValue }) => {
     try {
+      console.log('started')
       const formData = new FormData();
       formData.append('galleryId', galleryId);
       formData.append('image', file);
@@ -103,6 +104,7 @@ export const uploadGalleryImage = createAsyncThunk(
           'Content-Type': 'multipart/form-data',
         },
       });
+      console.log(response.data)
       return response.data;
     } catch (error: any) {
 
