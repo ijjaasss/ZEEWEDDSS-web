@@ -49,7 +49,6 @@ export const uploadToTelegram = async (filePath) => {
       },
       maxBodyLength: Infinity,
       maxContentLength: Infinity,
-      timeout,
       maxRedirects: 0,
       httpAgent: new http.Agent({ keepAlive: true }),
       httpsAgent: new https.Agent({ keepAlive: true })
@@ -61,13 +60,14 @@ export const uploadToTelegram = async (filePath) => {
     if (!fileObj?.file_id) {
       throw new Error('Invalid file response from Telegram');
     }
+       const fileId = fileObj.file_id;
 
     const fileRes = await axios.get(
       `https://api.telegram.org/bot${botToken}/getFile?file_id=${fileObj.file_id}`,
       { timeout: 10000 }
     );
-
-    return `https://api.telegram.org/file/bot${botToken}/${fileRes.data.result.file_path}`;
+    const url = `https://api.telegram.org/file/bot${botToken}/${fileRes.data.result.file_path}`;
+    return { fileId, url };
   } catch (err) {
     console.error('Detailed upload error:', {
       fileSizeMB: (fileSize / (1024 * 1024)).toFixed(2),

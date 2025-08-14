@@ -1,7 +1,9 @@
+
 import GalleryImage from "../models/galleryImageModel.js";
 import Gallery from "../models/galleryModel.js";
 import { isValid } from "../services/validation.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { generateNewTelegramUrl, validateTelegramUrl } from "../services/telagramService.js";
 
 export const createGallery = asyncHandler(async (req, res) => {
   const { clientName, eventName, eventDate } = req.body;
@@ -48,7 +50,14 @@ export const getGallery = asyncHandler(async (req, res) => {
 
   const imageIds = gallery.images.slice((page - 1) * limit, page * limit);
   const images = await GalleryImage.find({ _id: { $in: imageIds } }).sort({ createdAt: -1 });
-
+    for (let img of images) {
+    const isValid = await validateTelegramUrl(img.url);
+    if (!isValid) {
+      const newUrl = await generateNewTelegramUrl(img.fileId);
+      img.url = newUrl;
+      await img.save(); // update in DB
+    }
+  }
   res.status(200).json({
     success: true,
     data: {

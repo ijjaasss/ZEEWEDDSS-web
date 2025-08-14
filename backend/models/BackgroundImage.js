@@ -2,6 +2,7 @@
 import mongoose from 'mongoose';
 
 const backgroundImageSchema = new mongoose.Schema({
+  fileId: { type: String, required: true },
   pageType: {
     type: String,
     enum: ['home', 'about'],

@@ -2,6 +2,7 @@
 import fs from 'fs/promises';
 import { BackgroundImage } from '../models/BackgroundImage.js';
 import { uploadToTelegram } from '../utils/uploadToTelegram.js';
+import { generateNewTelegramUrl, validateTelegramUrl } from '../services/telagramService.js';
 
 export const uploadBackgroundImage = async (req, res) => {
   try {
@@ -16,13 +17,14 @@ export const uploadBackgroundImage = async (req, res) => {
       return res.status(400).json({ success: false, message: "pageType must be 'home' or 'about'" });
     }
 
-    const imageUrl = await uploadToTelegram(file.path);
+    const { fileId, url: imageUrl } = await uploadToTelegram(file.path);
 
 
     const existing = await BackgroundImage.findOne({ pageType });
     let imageDoc;
 
     if (existing) {
+      existing.fileId = fileId;
       existing.url = imageUrl;
       existing.filename = file.originalname;
       existing.uploadedAt = new Date();
@@ -30,6 +32,7 @@ export const uploadBackgroundImage = async (req, res) => {
       imageDoc = existing;
     } else {
       imageDoc = await BackgroundImage.create({
+       fileId,
         pageType,
         url: imageUrl,
         filename: file.originalname
@@ -53,7 +56,14 @@ export const getBackgroundImage = async (req, res) => {
   
   
     const images = await BackgroundImage.find();
-
+      await Promise.all(images.map(async (img) => {
+      const isValid = await validateTelegramUrl(img.url);
+      if (!isValid) {
+        const newUrl = await generateNewTelegramUrl(img.fileId);
+        img.url = newUrl;
+        await img.save();
+      }
+    }));
     const result = {
       home: null,
       about: null,

@@ -79,10 +79,12 @@ export const uploadImage = async (req, res) => {
       tempFiles.push(finalPath);
     }
     // Upload to Telegram
-    const imageUrl = await uploadToTelegram(finalPath);
-
+    console.log('start to upload')
+    const { fileId, url: imageUrl } = await uploadToTelegram(finalPath);
+    console.log('finish',fileId,  imageUrl )
     // Save in MongoDB
     const imageDoc = await GalleryImage.create({
+      fileId, 
       url: imageUrl,
       filename: file.originalname,
       size: file.size,

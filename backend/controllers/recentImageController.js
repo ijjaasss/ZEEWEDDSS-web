@@ -2,6 +2,7 @@
 import fs from 'fs/promises';
 import { RecentImage } from '../models/RecentImage.js';
 import { uploadToTelegram } from '../utils/uploadToTelegram.js';
+import { generateNewTelegramUrl, validateTelegramUrl } from '../services/telagramService.js';
 
 export const uploadRecentImage = async (req, res) => {
   try {
@@ -12,9 +13,10 @@ export const uploadRecentImage = async (req, res) => {
     }
 
   
-    const imageUrl = await uploadToTelegram(file.path);
+    const { fileId, url: imageUrl } = await uploadToTelegram(file.path);
 
     const imageDoc = await RecentImage.create({
+      fileId,
       url: imageUrl,
       filename: file.originalname,
       size: file.size,
@@ -38,6 +40,14 @@ export const uploadRecentImage = async (req, res) => {
 export const getRecentImages = async (req, res) => {
   try {
     const images = await RecentImage.find().sort({ uploadedAt: -1 }).limit(20);
+     await Promise.all(images.map(async (img) => {
+      const isValid = await validateTelegramUrl(img.url);
+      if (!isValid) {
+        const newUrl = await generateNewTelegramUrl(img.fileId);
+        img.url = newUrl;
+        await img.save();
+      }
+    }));
     res.json({ success: true, data: images });
   } catch (err) {
     console.error("Fetch recent images failed:", err);
