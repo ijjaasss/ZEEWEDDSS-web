@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ImageGrid } from '../../components/gallery/ImageGrid';
 import { Button } from '../../components/ui/Button';
 import { GalleryImage } from '../../types/Gallery';
-import { ArrowLeft, Upload, Download, Calendar, User, Loader2 } from 'lucide-react';
+import { ArrowLeft, Upload, Calendar, User, Loader2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getGalleryById, uploadGalleryImage } from '../../features/gallerySlice';
 
@@ -12,8 +12,6 @@ export const GalleryView: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedImages, setSelectedImages] = useState<GalleryImage[]>([]);
-  const [isDownloading, setIsDownloading] = useState(false);
   const [page, setPage] = useState(1);
 
   const { currentGallery, loading, error, uploadLoading, hasMore } = useAppSelector((state) => state.gallery);
@@ -71,31 +69,6 @@ export const GalleryView: React.FC = () => {
       await new Promise((res) => setTimeout(res, 300));
     } catch (err) {
       console.error('Download failed for image:', image._id, err);
-    }
-  };
-
-  const handleDownloadAll = async () => {
-    if (!currentGallery?.images || currentGallery.images.length === 0) return;
-    setIsDownloading(true);
-    try {
-      for (const image of currentGallery.images) {
-        await downloadFile(image);
-      }
-    } finally {
-      
-      setIsDownloading(false);
-    }
-  };
-
-  const handleDownloadSelected = async () => {
-    if (selectedImages.length === 0) return;
-    setIsDownloading(true);
-    try {
-      for (const image of selectedImages) {
-        await downloadFile(image);
-      }
-    } finally {
-      setIsDownloading(false);
     }
   };
 
@@ -167,30 +140,16 @@ export const GalleryView: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {isAdmin && (
-                <Button variant="outline" onClick={handleAddImages} disabled={uploadLoading}>
-                  {uploadLoading ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Upload className="w-4 h-4 mr-2" />
-                  )}
-                  {uploadLoading ? 'Uploading...' : 'Add Images'}
-                </Button>
-              )}
-              {selectedImages.length==0&&<Button
-                onClick={handleDownloadAll}
-                disabled={!currentGallery.images || currentGallery.images.length === 0 || isDownloading}
-              >
-                {isDownloading ? (
+            {isAdmin && (
+              <Button variant="outline" onClick={handleAddImages} disabled={uploadLoading}>
+                {uploadLoading ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 ) : (
-                  <Download className="w-4 h-4 mr-2" />
+                  <Upload className="w-4 h-4 mr-2" />
                 )}
-                Download All
+                {uploadLoading ? 'Uploading...' : 'Add Images'}
               </Button>
-              }
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -198,12 +157,7 @@ export const GalleryView: React.FC = () => {
         {currentGallery.images && currentGallery.images.length > 0 ? (
           <ImageGrid
             images={currentGallery.images}
-            allowSelection={true}
-            onSelectionChange={setSelectedImages}
-            onDownloadSelected={handleDownloadSelected}
-            onDownloadAll={handleDownloadAll}
-            downloadLoading={isDownloading}
-            selectionDisabled={uploadLoading}
+            onDownload={downloadFile}
             hasMore={hasMore}
             onLoadMore={handleLoadMore}
             isLoading={loading}
